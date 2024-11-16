@@ -1,91 +1,244 @@
 // artistList.cpp: function definitions for prototypes for artistList.h header file
 // place header includes here
+#include "../include/artistList.hpp"
+#include <iostream>
 
 ArtistList::ArtistEntry::ArtistEntry(ArtistList* list, const Artist& a) {
-  /* Insert your code here */
+  this->list = list;
+  this->next = nullptr;
+  this->prev = nullptr;
+  this->artist = a;
 }
 
 // Allocate a new artist list
 ArtistList::ArtistList() {
-  /* Insert your code here */
+  this->length = 0;
+  this->first = nullptr;
+  this->last = nullptr;
 }
 
 std::size_t ArtistList::size() const {
-  /* Insert your code here */
+  return this->length;
 }
 
 bool ArtistList::is_empty() const {
-  /* Insert your code here */
+  return this->size() == 0;
 }
 
 ArtistList::ArtistList(const ArtistList & list) {
-  /* Insert your code here */
+  this->length = 0;
+  this->first = nullptr;
+  this->last = nullptr;
+
+  if (list.first != nullptr){
+    ArtistEntry* current = list.first;
+    
+    while (current != nullptr) {
+      this->appendArtist(current->artist);
+      current = current->next;
+    }
+  }
 }
 
 // Delete a artist list (and all entries)
 ArtistList::~ArtistList() noexcept {
-  /* Insert your code here */
+  while (!is_empty()) {
+    removeLastArtist();
+  }
 }
 
 // prepend an artist at the beginning of list
 void ArtistList::prependArtist(const Artist& a) {
-  /* Insert your code here */
+  ArtistEntry *tmp = new ArtistEntry(this, a);
+
+  if (is_empty()){
+    first = last = tmp;
+  } else {
+    tmp->next = first;
+    first->prev = tmp;
+    first = tmp;
+    tmp = nullptr;
+  }
+  length++;
 }
 
 // append an artist to the end of the list
 void ArtistList::appendArtist(const Artist& a) {
-  /* Insert your code here */
+  ArtistEntry *tmp = new ArtistEntry(this, a);
+
+  if (is_empty()){
+    first = last = tmp;
+  } else {
+    tmp->prev = last;
+    last->next = tmp;
+    last = tmp;
+    tmp = nullptr;
+  }
+  length++;
 }
 
 // remove the first artist from the list
 void ArtistList::removeFirstArtist() {
-  /* Insert your code here */
+  if (is_empty()){
+    return;
+  }
+
+  ArtistEntry* tmp = this->first;
+  if (this->size() == 1) {
+    this->first = nullptr;
+    this->last = nullptr;
+  } else {
+    this->first = tmp->next;
+    this->first->prev = nullptr;
+  }
+  this->length--;
+  delete tmp;
 }
 
 // remove last artist from the list
 void ArtistList::removeLastArtist() {
-  /* Insert your code here */
+  if (is_empty()){
+    return;
+  }
+
+  ArtistEntry* tmp = this->last;
+  if (this->size() == 1) {
+    this->first = nullptr;
+    this->last = nullptr;
+  } else {
+    this->last = tmp->prev;
+    this->last->next = nullptr;
+  }
+  this->length--;
+  delete tmp;
 }
 
 // print an artist list
 void ArtistList::printArtistList() const {
-  /* Insert your code here */
+  if (is_empty()){
+    return;
+  }
+  
+  ArtistEntry* tmp = this->first;
+  do{
+    tmp->artist.printArtist();
+    tmp = tmp->next;
+  } while (tmp != nullptr);
 }
 
 // find an artist by name in an unsorted list
 Artist *ArtistList::findArtistName(const std::string& name) const {
-  /* Insert your code here */
+  if (is_empty()){
+    return nullptr;
+  }
+  
+  ArtistEntry* tmp = this->first;
+  while (tmp != nullptr){
+    if (tmp->artist.name() == name){
+      return &(tmp->artist);
+    }
+    tmp = tmp->next;
+  }
+  return nullptr;
 }
 
 // remove artist by name in an unsorted list
 void ArtistList::removeArtistbyName(const std::string & name) {
-  /* Insert your code here */
+  if (is_empty()){
+    return;
+  }
+  
+  ArtistEntry* tmp = this->first;
+  while (tmp != nullptr){
+    if (tmp->artist.name() == name){
+      if (tmp == this->first){
+        removeFirstArtist();
+      } else if (tmp == this->last){
+        removeLastArtist();
+      } else {
+        tmp->next->prev = tmp->prev;
+        this->length--;
+        delete tmp;
+      }
+      return;
+    }
+    tmp = tmp->next;
+  }
+  tmp = nullptr;
 }
 
 void ArtistList::insertArtistAt(std::size_t index, const Artist& artist) {
-  /* Insert your code here */
+  if (index >= this->size()){
+    return;
+  }
+
+  if (index == 0){
+    this->prependArtist(artist);
+  }
+
+  if (index == (this->size() - 1)){
+    this->appendArtist(artist);
+  }
+
+  ArtistEntry* tmp = this->first;
+  for (std::size_t i = 0; i < index; i++){
+    tmp = tmp->next;
+  }
+  
 }
 
 Artist * ArtistList::at(size_t index) {
-  /* Insert your code here */
+  if (index >= this->size()){
+    return nullptr;
+  }
+
+  if (index == 0){
+    this->firstArtist();
+  }
+
+  if (index == (this->size() - 1)){
+    this->lastArtist();
+  }
+
+  ArtistEntry* tmp = this->first;
+  for (std::size_t i = 0; i < index; i++){
+    tmp = tmp->next;
+  }
+  return &(tmp->artist);
 }
 
 const Artist * ArtistList::at(size_t index) const {
-  /* Insert your code here */
+  if (index >= this->size()){
+    return nullptr;
+  }
+
+  if (index == 0){
+    this->firstArtist();
+  }
+
+  if (index == (this->size() - 1)){
+    this->lastArtist();
+  }
+
+  const ArtistEntry* tmp = this->first;
+  for (std::size_t i = 0; i < index; i++){
+    tmp = tmp->next;
+  }
+  return &(tmp->artist);
 }
 
 Artist* ArtistList::firstArtist() {
-  /* Insert your code here */
+  return this->first ? &(this->first->artist) : nullptr;
 }
 
 const Artist* ArtistList::  firstArtist() const {
-  /* Insert your code here */
+  return this->first ? &(this->first->artist) : nullptr;
 }
 
 Artist* ArtistList:: lastArtist() {
-  /* Insert your code here */
+  return this->last ? &(this->last->artist) : nullptr;
 }
 
 const Artist* ArtistList:: lastArtist() const {
-  /* Insert your code here */
+  return this->last ? &(this->last->artist) : nullptr;
 }

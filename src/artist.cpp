@@ -23,7 +23,11 @@ void Artist::printArtist() const{
   cout << "Total Followers: " << this->total_followers << endl;
   cout << "Genres: ";
   for (std::size_t i = 0; i < max_genres; ++i) {
-        cout << this->genres[i];
+      if (this->genres[i] == ""){
+        continue;
+      }else{
+        cout << this->genres[i] << ",";
+      }
     }
   cout << endl;
   cout << "Popularity: " << this->popularity << endl;
