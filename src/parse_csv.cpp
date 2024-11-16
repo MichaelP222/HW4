@@ -2,6 +2,7 @@
 #include <artistList.hpp>
 #include <istream>
 #include <iostream>
+#include <sstream>
 
 // helper function provided to parse genres WITH square brackets
 static void parse_genres(std::istream & file, std::string genres[Artist::max_genres]) {
@@ -29,7 +30,27 @@ static void parse_genres(std::istream & file, std::string genres[Artist::max_gen
 
 // parse_csv needs to be written by the students
 ArtistList parse_csv(std::istream& file) {
-   // Insert code here
-   // be sure to call the provided parse_genres function to assist you
-   // in reading the genres column from the spotify_daily_charts_artists.csv
+    // Insert code here
+    // be sure to call the provided parse_genres function to assist you
+    // in reading the genres column from the spotify_daily_charts_artists.csv    
+    ArtistList parsed_list;
+    std::string line;
+    std::getline(file, line);
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string id;
+        std::string name;
+        std::string followers;
+        std::string genres[Artist::max_genres];
+        std::string popularity;
+        getline(ss,id,',');
+        getline(ss,name,',');
+        getline(ss,followers,',');
+        parse_genres(ss,genres);
+        getline(ss,popularity,',');
+        getline(ss,popularity,',');
+        Artist a(id,name,std::stoi(followers),genres,std::stoi(popularity));
+        parsed_list.appendArtist(a);
+    }
+    return parsed_list;
 }
